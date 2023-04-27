@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.List;
 
 public class Turma {
 
@@ -11,6 +12,38 @@ public class Turma {
 		this.codTurma = codTurma;
 		this.professor = professor;
 		this.horario = horario;
+		this.componente = componente;
+	}
+
+	public int getCodTurma() {
+		return codTurma;
+	}
+
+	public void setCodTurma(int codTurma) {
+		this.codTurma = codTurma;
+	}
+
+	public List<Professor> getProfessor() {
+		return professor;
+	}
+
+	public void setProfessor(List<Professor> professor) {
+		this.professor = professor;
+	}
+
+	public int getHorario() {
+		return horario;
+	}
+
+	public void setHorario(int horario) {
+		this.horario = horario;
+	}
+
+	public ComponenteCurricular getComponente() {
+		return componente;
+	}
+
+	public void setComponente(ComponenteCurricular componente) {
 		this.componente = componente;
 	}
 
@@ -41,5 +74,9 @@ public class Turma {
 	public boolean excluirTurma(Turma p) {
 		return false;
 	}
+
+    public String getNome() {
+        return null;
+    }
 
 }
