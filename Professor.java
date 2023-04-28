@@ -5,7 +5,7 @@ public class Professor {
 	private String formacao;
 	private String email;
 	private int identificacao;
-	private ArrayList<Professor> professores;
+	private static ArrayList<Professor> professores = new ArrayList<Professor>();
 	private ArrayList<Turma> turma;
 
 	public Professor(String nome, String formacao, String email, int identificacao, ArrayList<Turma> turma) {
@@ -14,9 +14,25 @@ public class Professor {
 		this.email = email;
 		this.identificacao = identificacao;
 		this.turma = turma;
-		this.professores = new ArrayList<Professor>();
+		professores.add(this);
 	}
-
+	public static Professor buscarProfessor(int identificacao) {
+		for (Professor p : professores) {
+			if (p.getIdentificacao() == identificacao) {
+				
+				return p;
+			}else{
+				System.out.println("Nummero de identificação nao existe");
+			}
+		}
+		return null;
+	}
+	
+	@Override
+	public String toString() {
+		return "Professor [nome: " + nome + ", formacao: " + formacao + ", email: " + email + ", identificacao: "
+				+ identificacao + ", turma: " + turma + "]";
+	}
 	public String getNome() {
 		return nome;
 	}
@@ -54,7 +70,7 @@ public class Professor {
 	}
 
 	public void setProfessores(ArrayList<Professor> professores) {
-		this.professores = professores;
+		Professor.professores = professores;
 	}
 
 	public ArrayList<Turma> getTurma() {
@@ -65,49 +81,38 @@ public class Professor {
 		this.turma = turma;
 	}
 
-	public boolean cadastrarProfessor(Professor professor) {
-		if (professor != null) {
-			professores.add(professor);
-			return true;
-		}
-		return false;
-	}
-
-	public boolean editarProfessor(Professor p) {
-		for (int i = 0; i < professores.size(); i++) {
-			Professor professor = professores.get(i);
-			if (professor.getIdentificacao() == p.getIdentificacao()) {
-				professor.setNome(p.getNome());
-				professor.setFormacao(p.getFormacao());
-				professor.setEmail(p.getEmail());
-				professor.setTurma(p.getTurma());
+	public boolean editarProfessor(int identificador) {	
+		Professor professor = buscarProfessor(identificador);
+			if (professor != null) {
+				professor.setNome(professor.getNome());
+				professor.setFormacao(professor.getFormacao());
+				professor.setEmail(professor.getEmail());
+				professor.setTurma(professor.getTurma());
 				return true;
-			}
-		}
+			}	
 		return false;
 	}
-	public void verDados(Professor p) {
-		System.out.println("Nome: " + p.getNome());
-		System.out.println("Formação: " + p.getFormacao());
-		System.out.println("Email: " + p.getEmail());
-		System.out.println("Identificação: " + p.getIdentificacao());
-		System.out.println("Turmas:");
-		for (Turma t : p.getTurma()) {
-			System.out.println("- " + t.getNome());
-		}
+	public static void verDados(int identificador) {
+		Professor professor = buscarProfessor(identificador);
+		if (professor!= null) {
+			professor.toString();
+		}	
 	}
 	
 	public ArrayList<Professor> listarProfessores() {
-		return this.professores;
+		return Professor.professores;
 	}
 	
-	public boolean excluirProfessor(Professor p) {
-		for (int i = 0; i < professores.size(); i++) {
-			Professor professor = professores.get(i);
-			if (professor.getIdentificacao() == p.getIdentificacao()) {
-				professores.remove(i);
-				return true;
+	public boolean excluirProfessor(int identificador) {
+		if (buscarProfessor(identificador) != null) {
+			for (int i = 0; i < professores.size(); i++) {
+				Professor professor = professores.get(i);
+				if (professor.getIdentificacao() == identificador) {
+					professores.remove(i);
+					return true;
+				}
 			}
+			return false;
 		}
 		return false;
 	}	

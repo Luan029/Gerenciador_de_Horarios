@@ -13,6 +13,7 @@ public class Turma {
         this.professor = professor;
         this.horario = horario;
         this.componente = componente;
+		turmas.add(this);
     }
 
     public int getCodTurma() {
@@ -47,10 +48,10 @@ public class Turma {
         this.componente = componente;
     }
 
-    public boolean cadastrarTurma(int codTurma, List<Professor> professor, int horario, ComponenteCurricular componente) {
-        Turma turma = new Turma(codTurma, professor, horario, componente);
-        return turmas.add(turma);
-    }
+    // public boolean cadastrarTurma(int codTurma, List<Professor> professor, int horario, ComponenteCurricular componente) {
+    //     Turma turma = new Turma(codTurma, professor, horario, componente);
+    //     return turmas.add(turma);
+    // }
 
 	public boolean editarTurma(Turma p) {
 		for (Turma t : turmas) {
