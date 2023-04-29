@@ -1,5 +1,5 @@
 import java.util.ArrayList;
-
+import java.util.Scanner;
 public class Professor {
 	private String nome;
 	private String formacao;
@@ -19,7 +19,6 @@ public class Professor {
 	public static Professor buscarProfessor(int identificacao) {
 		for (Professor p : professores) {
 			if (p.getIdentificacao() == identificacao) {
-				
 				return p;
 			}else{
 				System.out.println("Nummero de identificação nao existe");
@@ -84,10 +83,27 @@ public class Professor {
 	public boolean editarProfessor(int identificador) {	
 		Professor professor = buscarProfessor(identificador);
 			if (professor != null) {
-				professor.setNome(professor.getNome());
-				professor.setFormacao(professor.getFormacao());
-				professor.setEmail(professor.getEmail());
-				professor.setTurma(professor.getTurma());
+				System.out.println("O que você deseja editar?");
+				System.out.println("1 - Nome");
+				System.out.println("2 - Formação");
+				System.out.println("3 - Email");
+				System.out.println("4 - Turma");
+				System.out.println("5 - Cancelar");
+				Scanner ler = new Scanner(System.in);
+				int op;
+				op = ler.nextInt();
+				if(op == 1){
+					professor.setNome(professor.getNome());
+				}else if(op == 2){
+					professor.setFormacao(professor.getFormacao());
+				}else if(op == 3){
+					professor.setEmail(professor.getEmail());
+				}else if(op == 4){
+					professor.setTurma(professor.getTurma());
+				}else if(op == 5){
+					System.out.println("Cancelado");
+				}
+				ler.close();
 				return true;
 			}	
 		return false;

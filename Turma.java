@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class Turma {
     private int codTurma;
@@ -15,8 +16,23 @@ public class Turma {
         this.componente = componente;
 		turmas.add(this);
     }
-
-    public int getCodTurma() {
+	public static Turma buscarTurma(int codigoTurma){
+		for(Turma t : turmas){
+			if(t.getCodTurma() == codigoTurma){
+				return t;
+			}else{
+				System.out.println("Nummero de identificação nao existe");
+			}
+		}
+		return null;
+	}
+	
+    @Override
+	public String toString() {
+		return "Turma [codigo Turma: " + codTurma + ", professor: " + professor + ", horario: " + horario + ", componente: "
+				+ componente + "]";
+	}
+	public int getCodTurma() {
         return codTurma;
     }
 
@@ -53,25 +69,39 @@ public class Turma {
     //     return turmas.add(turma);
     // }
 
-	public boolean editarTurma(Turma p) {
-		for (Turma t : turmas) {
-			if (t.getCodTurma() == p.getCodTurma()) {
-				t.setProfessor(p.getProfessor());
-				t.setHorario(p.getHorario());
-				t.setComponente(p.getComponente());
+	public boolean editarTurma(int codigoTurma) {
+		Turma turmas = buscarTurma(codigoTurma);
+		if(turmas != null){
+			System.out.println("O que você deseja editar?");
+				System.out.println("1 - Codigo da turma");
+				System.out.println("2 - Professor");
+				System.out.println("3 - Horario");
+				System.out.println("4 - Componente");
+				System.out.println("5 - Cancelar");
+				Scanner ler = new Scanner(System.in);
+				int op;
+				op = ler.nextInt();
+				if(op == 1){
+					turmas.setCodTurma(turmas.getCodTurma());
+				}else if(op == 2){
+					turmas.setProfessor(turmas.getProfessor());
+				}else if(op == 3){
+					turmas.setHorario(turmas.getHorario());
+				}else if(op == 4){
+					turmas.setComponente(turmas.getComponente());
+				}else if(op == 5){
+					System.out.println("Cancelado");
+				}
+				ler.close();
 				return true;
-			}
 		}
 		return false;
 	}
 
-    public void verDadoDeUmaTurma(Turma p) {
-		System.out.println("Código da turma: " + p.getCodTurma());
-		System.out.println("Horário da turma: " + p.getHorario());
-		System.out.println("Componente curricular: " + p.getComponente().getNome());
-		System.out.println("Professores:");
-		for (Professor prof : p.getProfessor()) {
-			System.out.println("- " + prof.getNome());
+    public void verDadoDeUmaTurma(int codigoTurma) {
+		Turma turmas = buscarTurma(codigoTurma);
+		if(turmas != null){
+			turmas.toString();
 		}
 	}
 	
@@ -103,17 +133,17 @@ public class Turma {
 	}
 	
 
-    public boolean excluirTurma(Turma p) {
-		for (Turma t : turmas) {
-			if (t.equals(p)) {
-				turmas.remove(t);
-				return true;
+    public boolean excluirTurma(int codigoTurma) {
+		if (buscarTurma(codigoTurma) != null) {
+			for (int i = 0; i < turmas.size(); i++) {
+				Turma turma = turmas.get(i);
+				if (turma.getCodTurma() == codigoTurma) {
+					turmas.remove(i);
+					return true;
+				}
 			}
+			return false;
 		}
 		return false;
 	}
-	
-    public String getNome() {
-        return null;
-    }
 }
