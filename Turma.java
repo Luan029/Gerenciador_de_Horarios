@@ -16,7 +16,9 @@ public class Turma {
         this.componente = componente;
 		turmas.add(this);
     }
-	public static Turma buscarTurma(int codigoTurma){
+	public Turma(String t) {
+    }
+    public static Turma buscarTurma(int codigoTurma){
 		for(Turma t : turmas){
 			if(t.getCodTurma() == codigoTurma){
 				return t;
@@ -63,11 +65,6 @@ public class Turma {
     public void setComponente(ComponenteCurricular componente) {
         this.componente = componente;
     }
-
-    // public boolean cadastrarTurma(int codTurma, List<Professor> professor, int horario, ComponenteCurricular componente) {
-    //     Turma turma = new Turma(codTurma, professor, horario, componente);
-    //     return turmas.add(turma);
-    // }
 
 	public boolean editarTurma(int codigoTurma) {
 		Turma turmas = buscarTurma(codigoTurma);

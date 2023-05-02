@@ -11,7 +11,7 @@ public class PostgreSQLConnection {
     private final String password = "mypassword"; // Senha do Banco
 
     // Cria uma conexão com o Banco de Dados
-    private PostgreSQLConnection() {
+    PostgreSQLConnection() {
         try { // Tenta Conectar
             Class.forName("org.postgresql.Driver");
             this.connection = DriverManager.getConnection(url, username, password);

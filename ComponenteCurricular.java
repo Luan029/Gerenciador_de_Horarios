@@ -3,14 +3,12 @@ import java.util.List;
 import java.util.Scanner;
 
 public class ComponenteCurricular {
-
     private boolean obrigatorio;
     private int semestre;
     private int cargaHoraria;
     private String nome;
     private int codComponente;
     private List<Turma> turmas;
-
     private static ArrayList<ComponenteCurricular> componente = new ArrayList<ComponenteCurricular>();
 
     public ComponenteCurricular(boolean obrigatorio, int semestre, int cargaHoraria, String nome, int codComponente,
@@ -27,12 +25,10 @@ public class ComponenteCurricular {
     public static ComponenteCurricular buscarComponente(int codigoComponente) {
         for (ComponenteCurricular c : componente) {
             if (c.getCodComponente() == codigoComponente) {
-
                 return c;
-            } else {
-                System.out.println("Nummero de identificação nao existe");
             }
         }
+        System.out.println("Número de identificação não existe");
         return null;
     }
 
@@ -83,6 +79,10 @@ public class ComponenteCurricular {
         this.cargaHoraria = cargaHoraria;
     }
 
+    public int getHorasAulaPorSemana() {
+        return cargaHoraria / 30 * 2;
+    }
+
     public String getNome() {
         return nome;
     }
@@ -98,17 +98,6 @@ public class ComponenteCurricular {
     public void setTurmas(List<Turma> turmas) {
         this.turmas = turmas;
     }
-
-    // public boolean cadastrarComponente(ComponenteCurricular componente,
-    // ArrayList<ComponenteCurricular> listaComponentes) {
-    // if (componente == null || listaComponentes == null) {
-    // return false;
-    // }
-
-    // listaComponentes.add(componente);
-    // return true;
-    // }
-
     public boolean editarComponente(int codigoComponente) {
         ComponenteCurricular componente = buscarComponente(codigoComponente);
         if (componente != null) {
@@ -123,15 +112,24 @@ public class ComponenteCurricular {
             int op;
             op = ler.nextInt();
             if (op == 1) {
-                componente.setNome(componente.getNome());
+                System.out.println("Digite o novo nome:");
+                String nome = ler.next();
+                componente.setNome(nome);
             } else if (op == 2) {
-                componente.setObrigatorio(componente.isObrigatorio());
+                System.out.println("O componente curricular é obrigatório? (s/n)");
+                String resposta = ler.next();
+                boolean obrigatorio = resposta.equalsIgnoreCase("s");
+                componente.setObrigatorio(obrigatorio);
             } else if (op == 3) {
-                componente.setSemestre(componente.getSemestre());
+                System.out.println("Digite o novo semestre:");
+                int semestre = ler.nextInt();
+                componente.setSemestre(semestre);
             } else if (op == 4) {
-                componente.setCargaHoraria(componente.getCargaHoraria());
+                System.out.println("Digite a nova carga horária (em horas):");
+                int cargaHoraria = ler.nextInt();
+                componente.setCargaHoraria(cargaHoraria);
             } else if (op == 5) {
-                componente.setTurmas(componente.getTurmas());
+                
             } else if (op == 6) {
                 System.out.println("Cancelado");
             }
@@ -140,6 +138,7 @@ public class ComponenteCurricular {
         }
         return false;
     }
+    
 
     public static void verDadosDeUmComponente(int codigoComponente) {
         ComponenteCurricular componente = buscarComponente(codigoComponente);
@@ -147,31 +146,6 @@ public class ComponenteCurricular {
             componente.toString();
         }
     }
-    // public ArrayList<String> verDadosDeUmComponente(String nomeComponente,
-    // ArrayList<ComponenteCurricular> listaComponentes) {
-    // for (ComponenteCurricular c : listaComponentes) {
-    // if (c.getNome().equals(nomeComponente)) {
-    // ArrayList<String> dadosComponente = new ArrayList<String>();
-    // dadosComponente.add("Nome: " + c.getNome());
-    // dadosComponente.add("Obrigatório: " + (c.isObrigatorio() ? "Sim" : "Não"));
-    // dadosComponente.add("Semestre: " + c.getSemestre());
-    // dadosComponente.add("Carga Horária: " + c.getCargaHoraria());
-
-    // StringBuilder turmas = new StringBuilder();
-    // for (Turma t : c.getTurmas()) {
-    // turmas.append(t.getCodTurma()).append(", ");
-    // }
-    // if (turmas.length() > 0) {
-    // turmas.setLength(turmas.length() - 2);
-    // }
-    // dadosComponente.add("Turmas: " + turmas.toString());
-
-    // return dadosComponente;
-    // }
-    // }
-    // return null;
-    // }
-
     public ArrayList<ComponenteCurricular> listarComponentes(ArrayList<ComponenteCurricular> listaComponentes) {
         return listaComponentes;
     }
@@ -189,17 +163,6 @@ public class ComponenteCurricular {
         }
         return false;
 
-        // ComponenteCurricular componente = buscarComponente(codigoComponente);
-        // if (componente != null) {
-        // componente.remove();
-
-        // }
-        // if (componente == null || listaComponentes == null) {
-        // return false;
-        // }
-
-        // return listaComponentes.remove(componente);
     }
-    // lucas teste
 
 }
