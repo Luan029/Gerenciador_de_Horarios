@@ -1,4 +1,3 @@
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -178,10 +177,10 @@ public boolean editarProfessor(int identificador) {
 				} else {
 					System.out.println("Turma não encontrada");
 				}
-			} else {
-				ler.close();
-				return false;
+			} else if(op == 5) {
+				System.out.println("Cancelado");	
 			}
+			ler.close();
 			try {
 				String query = "UPDATE professores SET nome = ?, formacao = ?, email = ?, turma = ? WHERE identificacao = ?";
 				PreparedStatement ps = db.getConnection().prepareStatement(query);
