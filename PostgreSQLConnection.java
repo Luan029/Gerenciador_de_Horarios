@@ -6,9 +6,9 @@ public class PostgreSQLConnection {
     private static PostgreSQLConnection instance; // Instancia de Banco de Dados
     private Connection connection; // Conectar o Banco
 
-    private final String url = "jdbc:postgresql://localhost:5432/mydatabase"; // Url do Banco
-    private final String username = "myuser"; // Username do Banco
-    private final String password = "mypassword"; // Senha do Banco
+    private final String url = "jdbc:postgresql://projetopoo.cp2q0ntxu3y8.us-east-1.rds.amazonaws.com:5432/dbpoo"; // Url do Banco
+    private final String username = "ProjetoPOO"; // Username do Banco
+    private final String password = "projeto123"; // Senha do Banco
 
     // Cria uma conexão com o Banco de Dados
     PostgreSQLConnection() {
@@ -42,3 +42,20 @@ public class PostgreSQLConnection {
         }
     }
 }
+/*create table componente_curricular
+	(id_comp serial,
+	nome varchar(50) not null,
+	carga_horaria int,
+	semestre int,
+	codigo_componente char(10) not null,
+	obrigatorio boolean,
+	turmas int,
+	primary key(id_comp))
+	
+create table professor
+	(id_prof serial,
+	nome varchar(50) not null,
+	formação varchar(50),
+	email varchar(50),
+	codigo_identificação char(10) not null,
+	primary key(id_prof)) */

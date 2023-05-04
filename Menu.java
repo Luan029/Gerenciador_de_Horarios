@@ -6,7 +6,7 @@ public class Menu {
     public static void main(String[] args) {
 
         Scanner ler = new Scanner(System.in);
-        Professor novoProfessor = new Professor(null, null, null, 0, null);
+        Professor novoProfessor = new Professor();
         int opcao = 0;
 
         do {
