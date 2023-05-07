@@ -1,9 +1,12 @@
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 public class ComponenteCurricular {
     private boolean obrigatorio;
@@ -11,91 +14,19 @@ public class ComponenteCurricular {
     private int cargaHoraria;
     private String nome;
     private int codComponente;
-    private List<Turma> turmas;
-    private int turma;
-    private static PostgreSQLConnection db = PostgreSQLConnection.getInstance();
-    private static ArrayList<ComponenteCurricular> componente;
+    private List<Turma> turmas = new ArrayList<>();
 
-    static{
-        componente = new ArrayList<>();
-    }
-    public ComponenteCurricular(){
-        this.obrigatorio = false;
-        this.cargaHoraria = 0;
-        this.semestre = 0;
-        this.nome = "";
-        this.codComponente = 0;
-        this.turmas = null;
-    }
     public ComponenteCurricular(boolean obrigatorio, int semestre, int cargaHoraria, String nome, int codComponente,
             List<Turma> turmas) {
         this.obrigatorio = obrigatorio;
         this.semestre = semestre;
         this.cargaHoraria = cargaHoraria;
         this.nome = nome;
+        this.codComponente = codComponente;
         this.turmas = turmas;
-        this.codComponente = codComponente;
-        try{
-            String query = "INSERT INTO componente(obrigatorio, semestre, cargaHoraria, nome, codComponente) VALUES(?,?,?,?,?)";
-            PreparedStatement ps = db.getConnection().prepareStatement(query);
-            ps.setInt(2, semestre);
-            ps.setInt(3, cargaHoraria);
-            ps.setBoolean(1, obrigatorio);
-            ps.setString(4, nome);
-            ps.setInt(5, codComponente);
-            ps.executeUpdate();
-        }catch(SQLException e){
-            System.err.println("Error inserting data into database: " + e.getMessage());
-        }
     }
 
-    public static ComponenteCurricular buscarComponente(int codigoComponente) {
-        try{
-            String query = "SELECT * FFROM componente WHERE codigoComponente = ?";
-            PreparedStatement ps = db.getConnection().prepareStatement(query);
-            ps.setInt(1, codigoComponente);
-            ResultSet rs = ps.executeQuery();
-            if(rs.next()){
-                String nome = rs.getString("nome");
-                Boolean obrigatorio = rs.getBoolean("obrigatorio");
-                int semestre = rs.getInt("semestre");
-                int cargaHoraria = rs.getInt("cargaHoraria");
-                ArrayList<Turma> turma = new ArrayList<Turma>();
-                ComponenteCurricular componente = new ComponenteCurricular(obrigatorio, semestre, cargaHoraria, nome, codigoComponente, turma);
-
-                return componente;
-            }else{
-                System.out.println("Número de identificação não existe");
-				return null;
-            }
-        }catch (SQLException e) {
-            System.err.println("Error querying database: " + e.getMessage());
-            return null;
-        }
-       
-    }
-
-    @Override
-    public String toString() {
-        return "ComponenteCurricular [obrigatorio: " + obrigatorio + ", semestre: " + semestre + ", carga Horaria: "
-                + cargaHoraria + ", nome: " + nome + ", codigo do Componente: " + codComponente + ", turmas: " + turmas
-                + "]";
-    }
-    
-    public int getCodComponente() {
-        return codComponente;
-    }
-
-    public void setCodComponente(int codComponente) {
-        this.codComponente = codComponente;
-    }
-
-    public static ArrayList<ComponenteCurricular> getComponente() {
-        return componente;
-    }
-
-    public static void setComponente(ArrayList<ComponenteCurricular> componente) {
-        ComponenteCurricular.componente = componente;
+    public ComponenteCurricular() {
     }
 
     public boolean isObrigatorio() {
@@ -122,16 +53,20 @@ public class ComponenteCurricular {
         this.cargaHoraria = cargaHoraria;
     }
 
-    public int getHorasAulaPorSemana() {
-        return cargaHoraria / 30 * 2;
-    }
-
     public String getNome() {
         return nome;
     }
 
     public void setNome(String nome) {
         this.nome = nome;
+    }
+
+    public int getCodComponente() {
+        return codComponente;
+    }
+
+    public void setCodComponente(int codComponente) {
+        this.codComponente = codComponente;
     }
 
     public List<Turma> getTurmas() {
@@ -141,107 +76,193 @@ public class ComponenteCurricular {
     public void setTurmas(List<Turma> turmas) {
         this.turmas = turmas;
     }
-    public int getTurmaValue() {
-		return turma;
-	}
-	
-	public void setTurmaValue(int i) {
-		this.turma = i;
-	}
-    public static PostgreSQLConnection getDb() {
-        return db;
-    }
-    public static void setDb(PostgreSQLConnection db) {
-        ComponenteCurricular.db = db;
+
+    @Override
+    public String toString() {
+        return "ComponenteCurricular [E obrigatorio? " + obrigatorio + " | semestre: " + semestre + " | carga horaria: "
+                + cargaHoraria + " | nome: " + nome + " | codigo componente: " + codComponente + " | turmas: " + turmas
+                + "]";
     }
 
-    public boolean editarComponente(int codigoComponente) {
-        ComponenteCurricular componente = buscarComponente(codigoComponente);
-        if (componente != null) {
-            System.out.println("O que você deseja editar?");
-            System.out.println("1 - Nome");
-            System.out.println("2 - Se é obrigatorio ou não");
-            System.out.println("3 - Semestre");
-            System.out.println("4 - Carga horaria");
-            System.out.println("5 - Turmas");
-            System.out.println("6 - Cancelar");
-            Scanner ler = new Scanner(System.in);
-            int op;
-            op = ler.nextInt();
-            if (op == 1) {
-                System.out.println("Digite o novo nome:");
-                String nome = ler.next();
-                componente.setNome(nome);
-            } else if (op == 2) {
-                System.out.println("O componente curricular é obrigatório? (s/n)");
-                String resposta = ler.next();
-                boolean obrigatorio = resposta.equalsIgnoreCase("s");
-                componente.setObrigatorio(obrigatorio);
-            } else if (op == 3) {
-                System.out.println("Digite o novo semestre:");
-                int semestre = ler.nextInt();
-                componente.setSemestre(semestre);
-            } else if (op == 4) {
-                System.out.println("Digite a nova carga horária (em horas):");
-                int cargaHoraria = ler.nextInt();
-                componente.setCargaHoraria(cargaHoraria);
-            } else if (op == 5) {
-                System.out.println("Digite o identificador da turma:");
-				int idTurma = ler.nextInt();
-				Turma turma = Turma.buscarTurma(idTurma);
-				if (turma != null) {
-					componente.setTurmaValue(turma.getCodTurma());
-				} else {
-					System.out.println("Turma não encontrada");
-				}
-            } else if (op == 6) {
-                System.out.println("Cancelado");
-            }ler.close();
-            try{
-                String query = "UPDATE componente SET nome = ?, obrigatorio = ?, semestre = ?, cargaHoraria = ?, turma = ? WHERE codigoComponente = ?";
-                PreparedStatement ps = db.getConnection().prepareStatement(query);
-                ps.setString(1,  componente.getNome());
-                ps.setBoolean(2, componente.isObrigatorio());
-                ps.setInt(3, componente.getSemestre());
-                ps.setInt(4, componente.getCargaHoraria());
-                ps.setInt(5, componente.getTurmaValue());
-                ps.setInt(6, componente.getCodComponente());
-                ps.executeUpdate();
-                System.out.println("Componente atualizado com sucesso!");
-				return true;
-            }catch (SQLException e) {
-				System.err.println("Error updating data in database: " + e.getMessage());
-			}
-        }
-        return false;
+    public void salvar() throws IOException {
+        BufferedWriter writer = new BufferedWriter(new FileWriter("componentes.txt", true));
+        writer.write(codComponente + ";" + nome + ";" + obrigatorio + ";" + semestre + ";" + cargaHoraria + ";" + turmas
+                + ";");
+        writer.newLine();
+        writer.close();
     }
 
-    public static void verDadosDeUmComponente(int codigoComponente) {
-        ComponenteCurricular componente = buscarComponente(codigoComponente);
-        if (componente != null) {
-            componente.toString();
-        }
-    }
-    public ArrayList<ComponenteCurricular> listarComponentes() {
-        return ComponenteCurricular.componente;
-    }
+    public ComponenteCurricular buscarComponente(int codComponente) throws IOException {
+        File arquivo = new File("componentes.txt");
+        BufferedReader reader = new BufferedReader(new FileReader(arquivo));
+        String linha;
+        while ((linha = reader.readLine()) != null) {
+            String[] campos = linha.split(";");
+            if (Integer.parseInt(campos[0]) == codComponente) {
+                List<Turma> turmas = new ArrayList<>();
+                return new ComponenteCurricular(Boolean.parseBoolean(campos[2]), Integer.parseInt(campos[3]),
+                        Integer.parseInt(campos[4]), campos[1], Integer.parseInt(campos[0]), turmas);
 
-    public boolean excluirComponente(int codigoComponente) {
-        try{
-            String query = "DELETE FROM componente WHERE codigoComponente = ?";
-            PreparedStatement ps = db.getConnection().prepareStatement(query);
-            ps.setInt(1, codigoComponente);
-            int result = ps.executeUpdate();
-            if(result > 0 ){
-                return true;
-            }else{
-                System.out.println("Número de identificação não existe");
-				return false;
             }
-        }catch (SQLException e) {
-			System.err.println("Error deleting data from database: " + e.getMessage());
-			return false;
-		}
+        }
+        reader.close();
+        return null;// Componente nao encontrada
+
     }
-    
+
+    public boolean editarComponente(int codComponente) throws IOException {
+        ComponenteCurricular componente = buscarComponente(codComponente);
+        if (componente == null) {
+            System.out.println("Componente nao encontrado.");
+            return false;
+
+        }
+        System.out.println("Escolha qual atributo deseja editar:");
+        System.out.println("1. Codigo");
+        System.out.println("2. Semestre");
+        System.out.println("3. Carga Horaria");
+        System.out.println("4. Nome");
+        System.out.println("5. A obrigatoriedade");
+        System.out.println("6. A turma");
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        int opcao = Integer.parseInt(reader.readLine());
+        String novoValor;
+        int novoV;
+        boolean nov;
+
+        switch (opcao) {
+            case 1:
+                System.out.println("Digite o novo Codigo:");
+                novoV = Integer.parseInt(reader.readLine());
+                ComponenteCurricular codComp = buscarComponente(novoV);
+                if (codComp == null) {
+                    componente.setCodComponente(novoV);
+                } else {
+                    System.out.println("Ja existe outro componente com esse codigo");
+                }
+                break;
+            case 2:
+                System.out.println("Digite o novo semestre:");
+                novoV = Integer.parseInt(reader.readLine());
+                componente.setSemestre(novoV);
+                break;
+            case 3:
+                System.out.println("Digite a nova carga horaria:");
+                novoV = Integer.parseInt(reader.readLine());
+                componente.setCargaHoraria(novoV);
+                break;
+            case 4:
+                System.out.println("Digite o novo nome:");
+                novoValor = reader.readLine();
+                componente.setNome(novoValor);
+                break;
+            case 5:
+                nov = componente.isObrigatorio();
+                nov = true ? false : true;
+                componente.setObrigatorio(nov);
+                System.out.println("Seu componente agora e: " + ((nov) ? "Obrigatorio" : "Optativo"));
+            case 6:
+                boolean validacaoTurmas = false;
+                while (!validacaoTurmas) {
+                    System.out.println("Lista de turmas disponíveis:");
+                    Turma turmasLista = new Turma();
+                    turmasLista.listarTurmas();
+                    System.out.println("Digite o código da nova turma: ");
+                    novoV = Integer.parseInt(reader.readLine());
+                    Turma novaTurma = turmasLista.buscarTurma(novoV);
+                    if (novaTurma == null) {
+                        System.out.println("Código de turma inválido. Por favor, tente novamente.");
+                        validacaoTurmas = false;
+                    } else {
+                        System.out.print("Voce deseja remover o antigo?");
+                        System.out.println("1 - SIM | 2 - NAO: ");
+                        int escolha = Integer.parseInt(reader.readLine());
+                        if(escolha == 1){
+                            componente.getTurmas().clear();
+                        }
+                        componente.getTurmas().add(novaTurma);
+                        validacaoTurmas = true;
+                    }
+                }
+                break;
+            default:
+                System.out.println("Opção inválida.");
+                break;
+        }
+        // Lê todo o conteúdo do arquivo para a memória
+        BufferedReader reader2 = new BufferedReader(new FileReader("componentes.txt"));
+        StringBuilder sb = new StringBuilder();
+        String linha;
+        while ((linha = reader2.readLine()) != null) {
+            String[] campos = linha.split(";");
+            if (Integer.parseInt(campos[0]) == codComponente) {
+                // Atualiza a linha do professor que foi editado
+                linha = componente.getCodComponente() + ";" + componente.getNome() + ";" + componente.isObrigatorio() + ";"
+                        + componente.getSemestre() + ";" + componente.getCargaHoraria() + ";" + componente.getTurmas() + ";";
+            }
+            sb.append(linha).append("\n");
+        }
+        reader2.close();
+        // Sobrescreve o arquivo original com o conteúdo atualizado
+        BufferedWriter writer = new BufferedWriter(new FileWriter("componentes.txt"));
+        writer.write(sb.toString());
+        writer.close();
+        return true;
+    }
+
+    public void verDadosDeUmComponente(int codComponente) throws IOException {
+        ComponenteCurricular componente = buscarComponente(codComponente);
+        if (componente == null) {
+            System.out.println("Componente não encontrado.");
+        } else {
+            System.out.println(componente.toString());
+        }
+    }
+
+    public void listarCompoentes() throws IOException {
+        File arquivo = new File("componentes.txt");
+        if (arquivo.exists() && arquivo.length() > 0) {
+            BufferedReader reader = new BufferedReader(new FileReader(arquivo));
+            String linha;
+            while ((linha = reader.readLine()) != null) {
+                String[] campos = linha.split(";");
+                ComponenteCurricular componente = new ComponenteCurricular(Boolean.parseBoolean(campos[2]),
+                        Integer.parseInt(campos[3]),
+                        Integer.parseInt(campos[4]), campos[1], Integer.parseInt(campos[0]), turmas);
+                System.out.println(componente.toString());
+            }
+            reader.close();
+        } else {
+            System.out.println("Nao tem componentes no banco.");
+        }
+    }
+
+    public boolean excluirComponente(int codComponente) throws IOException {
+        boolean componenteEncontrado = false;
+
+        // Lê todo o conteúdo do arquivo para a memória
+        BufferedReader reader = new BufferedReader(new FileReader("componentes.txt"));
+        StringBuilder sb = new StringBuilder();
+        String linha;
+        while ((linha = reader.readLine()) != null) {
+            String[] campos = linha.split(";");
+            if (Integer.parseInt(campos[0]) == codComponente) {
+                componenteEncontrado = true;
+                continue; // Pula a linha da turma que será excluída
+            }
+            sb.append(linha).append("\n");
+        }
+        reader.close();
+        if (!componenteEncontrado) {
+            System.out.println("Componente nao encontrado.");
+            return false;
+        }
+        // Sobrescreve o arquivo original com o conteúdo atualizado
+        BufferedWriter writer = new BufferedWriter(new FileWriter("componentes.txt"));
+        writer.write(sb.toString());
+        writer.close();
+
+        return true;
+    }
 }

@@ -1,0 +1,4 @@
+Código da turma: 9999;Semestre: 1;Dias de aula na semana: 1;Horários:;07:50 
+Professores: Professor [Nome: Leonardo | Identificacao: 777 | Email: julio@gmail.com | Formacao: pedreiro];Código da turma: 23451;Semestre: 1;Dias de aula na semana: 2;Horários:11:00 14:30 
+Professores: Professor [Nome: Lucas | Identificacao: 234 | Email: lucas@gmail.com | Formacao: doutor];
+

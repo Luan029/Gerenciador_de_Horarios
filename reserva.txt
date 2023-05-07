@@ -1,0 +1,165 @@
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+public class ComponenteCurricular {
+private boolean obrigatorio;
+private int semestre;
+private int cargaHoraria;
+private String nome;
+private int codComponente;
+private List<Turma> turmas;
+private int turma;
+private static ArrayList<ComponenteCurricular> componentes  = new ArrayList<>();
+
+public ComponenteCurricular(boolean obrigatorio, int semestre, int cargaHoraria, String nome, int codComponente,
+        List<Turma> turmas) {
+    this.obrigatorio = obrigatorio;
+    this.semestre = semestre;
+    this.cargaHoraria = cargaHoraria;
+    this.nome = nome;
+    this.turmas = turmas;
+    this.codComponente = codComponente;
+    componentes.add(this);
+    //salvarComponenteEmArquivo();
+}
+
+public ComponenteCurricular() {
+
+}
+	
+    public ComponenteCurricular(int parseInt, int parseInt2, int parseInt3, List<String> horarios,
+        List<Professor> professores) {
+}
+
+    /**
+     * @return boolean return the obrigatorio
+     */
+    public boolean isObrigatorio() {
+        return obrigatorio;
+    }
+
+    /**
+     * @param obrigatorio the obrigatorio to set
+     */
+    public void setObrigatorio(boolean obrigatorio) {
+        this.obrigatorio = obrigatorio;
+    }
+
+    /**
+     * @return int return the semestre
+     */
+    public int getSemestre() {
+        return semestre;
+    }
+
+    /**
+     * @param semestre the semestre to set
+     */
+    public void setSemestre(int semestre) {
+        this.semestre = semestre;
+    }
+
+    /**
+     * @return int return the cargaHoraria
+     */
+    public int getCargaHoraria() {
+        return cargaHoraria;
+    }
+
+    /**
+     * @param cargaHoraria the cargaHoraria to set
+     */
+    public void setCargaHoraria(int cargaHoraria) {
+        this.cargaHoraria = cargaHoraria;
+    }
+
+    /**
+     * @return String return the nome
+     */
+    public String getNome() {
+        return nome;
+    }
+
+    /**
+     * @param nome the nome to set
+     */
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    /**
+     * @return int return the codComponente
+     */
+    public int getCodComponente() {
+        return codComponente;
+    }
+
+    /**
+     * @param codComponente the codComponente to set
+     */
+    public void setCodComponente(int codComponente) {
+        this.codComponente = codComponente;
+    }
+
+    /**
+     * @return List<Turma> return the turmas
+     */
+    public List<Turma> getTurmas() {
+        return turmas;
+    }
+
+    /**
+     * @param turmas the turmas to set
+     */
+    public void setTurmas(List<Turma> turmas) {
+        this.turmas = turmas;
+    }
+
+    /**
+     * @return int return the turma
+     */
+    public int getTurma() {
+        return turma;
+    }
+
+    /**
+     * @param turma the turma to set
+     */
+    public void setTurma(int turma) {
+        this.turma = turma;
+    }
+    @Override
+    public String toString() {
+        return "ComponenteCurricular [cobrigatorio=" + obrigatorio + ", semestre=" + semestre + ", cargaHoraria=" + cargaHoraria
+                + ", nome=" + nome + ", codComponente=" + codComponente + "]";
+    }
+    public void salvar() throws IOException{
+        BufferedWriter writer = new BufferedWriter(new FileWriter("turmas.txt", true));
+        writer.write(obrigatorio +"; " + semestre + "; " + cargaHoraria + "; " + nome + "; " + codComponente);
+        writer.newLine();
+        writer.close();
+    }
+    public ArrayList<ComponenteCurricular> buscarComponenteCurricular(int codComponente) throws IOException{
+        File arquivo = new File("componentescurriculares.txt");
+        BufferedReader reader = new BufferedReader(new FileReader(arquivo));
+        String linha;
+        while ((linha = reader.readLine()) != null){
+            String[] campos = linha.split(";");
+            if (Integer.parseInt(campos[0]) == codComponente){
+                List<String> horarios = Arrays.asList(campos[4].split(", "));
+                List<Professor> professores = new ArrayList<>();
+                ComponenteCurricular componenteCurricular = new ComponenteCurricular(Integer.parseInt(campos[0]), Integer.parseInt(campos[1]), Integer.parseInt(campos[2]), horarios, professores);
+                return componentes; 
+            }
+        }
+        reader.close();
+        return null;
+    }
+}

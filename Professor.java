@@ -1,232 +1,203 @@
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 public class Professor {
-	private String nome;
-	private String formacao;
-	private String email;
-	private int identificacao;
-	private ArrayList<Turma> turmas; // lista de turmas do professor
-	private int turma;
-	private static PostgreSQLConnection db = PostgreSQLConnection.getInstance();
-	private static ArrayList<Professor> professores;
-	
-	static {
-		professores = new ArrayList<>();
-	}
-	public Professor() {
-		this.nome = "";
-		this.formacao = "";
-		this.email = "";
-		this.identificacao = 0;
-		this.turmas = new ArrayList<Turma>();
-	}
+    private String nome;
+    private int identificacao;
+    private String email;
+    private String formacao;
 
-	public Professor(String nome, String formacao, String email, int identificacao, ArrayList<Turma> turmas) {
-		this.nome = nome;
-		this.formacao = formacao;
-		this.email = email;
-		this.identificacao = identificacao;
-		this.turmas = turmas; // inicializa a lista de turmas
-		try {
-			String query = "INSERT INTO professores (nome, formacao, email, identificacao) VALUES (?, ?, ?, ?)";
-			PreparedStatement ps = db.getConnection().prepareStatement(query);
-			ps.setString(1, nome);
-			ps.setString(2, formacao);
-			ps.setString(3, email);
-			ps.setInt(4, identificacao);
-			ps.executeUpdate();
-		} catch (SQLException e) {
-			System.err.println("Error inserting data into database: " + e.getMessage());
-		}
-	}
+    public Professor(String nome, int identificacao, String email, String formacao) {
+        this.nome = nome;
+        this.identificacao = identificacao;
+        this.email = email;
+        this.formacao = formacao;
+    }
 
-	public static Professor buscarProfessor(int identificacao) {
-		try {
-			String query = "SELECT * FROM professores WHERE identificacao = ?";
-			PreparedStatement ps = db.getConnection().prepareStatement(query);
-			ps.setInt(1, identificacao);
-			ResultSet rs = ps.executeQuery();
-			if (rs.next()) {
-				String nome = rs.getString("nome");
-				String formacao = rs.getString("formacao");
-				String email = rs.getString("email");
-				ArrayList<Turma> turma = new ArrayList<Turma>();
-				// buscar turmas relacionadas ao professor
-				Professor professor = new Professor(nome, formacao, email, identificacao, turma);
-				return professor;
-			} else {
-				System.out.println("Número de identificação não existe");
-				return null;
-			}
-		} catch (SQLException e) {
-			System.err.println("Error querying database: " + e.getMessage());
-			return null;
-		}
-	}
+    public Professor() {
+    }
 
-	@Override
-	public String toString() {
-		return "Professor [nome: " + nome + ", formacao: " + formacao + ", email: " + email + ", identificacao: "
-				+ identificacao + ", turma: " + getTurmaValue() + "]";
-	}
+    public String getNome() {
+        return nome;
+    }
 
-	public String getNome() {
-		return nome;
-	}
-	
-	public List<Turma> getTurmas() {
-		return turmas;
-	}
-	
-	public void setTurmas(String string) {
-		this.turmas = new ArrayList<Turma>();
-		String[] turmas = string.split(",");
-		for (String t : turmas) {
-			this.turmas.add(new Turma(t));
-		}
-	}
-	
-	
-	public static PostgreSQLConnection getDb() {
-		return db;
-	}
-	
-	public static void setDb(PostgreSQLConnection db) {
-		Professor.db = db;
-	}
-	
-	public void setNome(String nome) {
-		this.nome = nome;
-	}
-	
-	public String getFormacao() {
-		return formacao;
-	}
-	
-	public void setFormacao(String formacao) {
-		this.formacao = formacao;
-	}
-	
-	public String getEmail() {
-		return email;
-	}
-	
-	public void setEmail(String email) {
-		this.email = email;
-	}
-	
-	public int getIdentificacao() {
-		return identificacao;
-	}
-	
-	public void setIdentificacao(int identificacao) {
-		this.identificacao = identificacao;
-	}
-	
-	public static List<Professor> getProfessores() {
-		return professores;
-	}
-	
-	public void setProfessores(List<Professor> professores) {
-		Professor.professores = (ArrayList<Professor>) professores;
-	}
-	
-	public int getTurmaValue() {
-		return turma;
-	}
-	
-	public void setTurmaValue(int i) {
-		this.turma = i;
-	}
-	
-public boolean editarProfessor(int identificador) {
-		Professor professor = buscarProfessor(identificador);
-		if (professor != null) {
-			System.out.println("O que você deseja editar?");
-			System.out.println("1 - Nome");
-			System.out.println("2 - Formação");
-			System.out.println("3 - Email");
-			System.out.println("4 - Turma");
-			System.out.println("5 - Cancelar");
-			Scanner ler = new Scanner(System.in);
-			int op = ler.nextInt();
-			String novoValor = null;
-			if (op == 1) {
-				System.out.println("Digite o novo nome:");
-				novoValor = ler.next();
-				professor.setNome(novoValor);
-			} else if (op == 2) {
-				System.out.println("Digite a nova formação:");
-				novoValor = ler.next();
-				professor.setFormacao(novoValor);
-			} else if (op == 3) {
-				System.out.println("Digite o novo email:");
-				novoValor = ler.next();
-				professor.setEmail(novoValor);
-			} else if (op == 4) {
-				System.out.println("Digite o identificador da turma:");
-				int idTurma = ler.nextInt();
-				Turma turma = Turma.buscarTurma(idTurma);
-				if (turma != null) {
-					professor.setTurmaValue(turma.getCodTurma());
-				} else {
-					System.out.println("Turma não encontrada");
-				}
-			} else if(op == 5) {
-				System.out.println("Cancelado");	
-			}
-			ler.close();
-			try {
-				String query = "UPDATE professores SET nome = ?, formacao = ?, email = ?, turma = ? WHERE identificacao = ?";
-				PreparedStatement ps = db.getConnection().prepareStatement(query);
-				ps.setString(1, professor.getNome());
-				ps.setString(2, professor.getFormacao());
-				ps.setString(3, professor.getEmail());
-				ps.setInt(4, professor.getTurmaValue());
-				ps.setInt(5, professor.getIdentificacao());
-				ps.executeUpdate();
-				System.out.println("Professor atualizado com sucesso!");
-				return true;
-			} catch (SQLException e) {
-				System.err.println("Error updating data in database: " + e.getMessage());
-				return false;
-			}
-		} else {
-			return false;
-		}
-	}
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
 
-	public static void verDados(int identificador) {
-		Professor professor = buscarProfessor(identificador);
-		if (professor != null) {
-			professor.toString();
-		}
-	}
+    public int getIdentificacao() {
+        return identificacao;
+    }
 
-	public ArrayList<Professor> listarProfessores() {
-		return Professor.professores;
-	}
+    public void setIdentificacao(int identificacao) {
+        this.identificacao = identificacao;
+    }
 
-	public boolean excluirProfessor(int identificador) {
-		try {
-			String query = "DELETE FROM professores WHERE identificacao = ?";
-			PreparedStatement ps = db.getConnection().prepareStatement(query);
-			ps.setInt(1, identificador);
-			int result = ps.executeUpdate();
-			if (result > 0) {
-				return true;
-			} else {
-				System.out.println("Número de identificação não existe");
-				return false;
-			}
-		} catch (SQLException e) {
-			System.err.println("Error deleting data from database: " + e.getMessage());
-			return false;
-		}
-	}
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getFormacao() {
+        return formacao;
+    }
+
+    public void setFormacao(String formacao) {
+        this.formacao = formacao;
+    }
+
+    @Override
+    public String toString() {
+        return "Professor [Nome: " + nome + " | Identificacao: " + identificacao + " | Email: " + email + " | Formacao: "
+                + formacao + "]";
+    }
+
+    public void salvar() throws IOException {
+        BufferedWriter writer = new BufferedWriter(new FileWriter("professores.txt", true));
+        writer.write(nome + ";" + identificacao + ";" + email + ";" + formacao);
+        writer.newLine();
+        writer.close();
+    }
+
+    public Professor buscarProfessor(int identificacao) throws IOException {
+        File arquivo = new File("professores.txt");
+        BufferedReader reader = new BufferedReader(new FileReader(arquivo));
+        String linha;
+        while ((linha = reader.readLine()) != null) {
+            String[] campos = linha.split(";");
+            if (Integer.parseInt(campos[1]) == identificacao) {
+                return new Professor(campos[0], Integer.parseInt(campos[1]), campos[2], campos[3]);
+            }
+        }
+        reader.close();
+        return null; // Professor não encontrado
+    }
+    
+
+    public boolean editarProfessor(int identificacao) throws IOException {
+        Professor professor = buscarProfessor(identificacao);
+        if (professor == null) {
+            System.out.println("Professor nao encontrado.");
+            return false;
+        }
+    
+        System.out.println("Escolha qual atributo deseja editar:");
+        System.out.println("1. Nome");
+        System.out.println("2. Identificacao");
+        System.out.println("3. Email");
+        System.out.println("4. Formacao");
+    
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        int opcao = Integer.parseInt(reader.readLine());
+    
+        String novoValor;
+        switch (opcao) {
+            case 1:
+                System.out.println("Digite o novo nome:");
+                novoValor = reader.readLine();
+                professor.setNome(novoValor);
+                break;
+            case 2:
+                System.out.println("Digite a nova identificacao:");
+                novoValor = reader.readLine();
+                professor.setIdentificacao(Integer.parseInt(novoValor));
+                break;
+            case 3:
+                System.out.println("Digite o novo email:");
+                novoValor = reader.readLine();
+                professor.setEmail(novoValor);
+                break;
+            case 4:
+                System.out.println("Digite a nova formacao:");
+                novoValor = reader.readLine();
+                professor.setFormacao(novoValor);
+                break;
+            default:
+                System.out.println("Opção invalida.");
+                return false;
+        }
+    
+        // Lê todo o conteúdo do arquivo para a memória
+        BufferedReader reader2 = new BufferedReader(new FileReader("professores.txt"));
+        StringBuilder sb = new StringBuilder();
+        String linha;
+        while ((linha = reader2.readLine()) != null) {
+            String[] campos = linha.split(";");
+            if (Integer.parseInt(campos[1]) == identificacao) {
+                // Atualiza a linha do professor que foi editado
+                linha = professor.getNome() + ";" + professor.getIdentificacao() + ";" + professor.getEmail() + ";" + professor.getFormacao();
+            }
+            sb.append(linha).append("\n");
+        }
+        reader2.close();
+    
+        // Sobrescreve o arquivo original com o conteúdo atualizado
+        BufferedWriter writer = new BufferedWriter(new FileWriter("professores.txt"));
+        writer.write(sb.toString());
+        writer.close();
+    
+        return true;
+    }
+    
+
+    public void verDadosDeUmProfessor(int identificacao) throws IOException {
+        Professor professor = buscarProfessor(identificacao);
+        if (professor == null) {
+            System.out.println("Professor não encontrado.");
+        } else {
+            System.out.println(professor.toString());
+        }
+    }
+    public void listarProfessores() throws IOException {
+        File arquivo = new File("professores.txt");
+        if (arquivo.exists() && arquivo.length() > 0) {
+            BufferedReader reader = new BufferedReader(new FileReader(arquivo));
+            String linha;
+            while ((linha = reader.readLine()) != null) {
+                String[] campos = linha.split(";");
+                Professor professor = new Professor(campos[0], Integer.parseInt(campos[1]), campos[2], campos[3]);
+                System.out.println(professor.toString());
+            }
+            reader.close();
+        } else {
+           System.out.println("Nao tem professores no banco.");
+        }
+    }
+    public boolean excluirProfessor(int identificacao) throws IOException {
+        boolean professorEncontrado = false;
+    
+        // Lê todo o conteúdo do arquivo para a memória
+        BufferedReader reader = new BufferedReader(new FileReader("professores.txt"));
+        StringBuilder sb = new StringBuilder();
+        String linha;
+        while ((linha = reader.readLine()) != null) {
+            String[] campos = linha.split(";");
+            if (Integer.parseInt(campos[1]) == identificacao) {
+                professorEncontrado = true;
+                continue; // Pula a linha do professor que será excluído
+            }
+            sb.append(linha).append("\n");
+        }
+        reader.close();
+    
+        if (!professorEncontrado) {
+            System.out.println("Professor nao encontrado.");
+            return false;
+        }
+    
+        // Sobrescreve o arquivo original com o conteúdo atualizado
+        BufferedWriter writer = new BufferedWriter(new FileWriter("professores.txt"));
+        writer.write(sb.toString());
+        writer.close();
+    
+        return true;
+    }        
 }
